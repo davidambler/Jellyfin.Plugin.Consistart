@@ -43,7 +43,7 @@ jobs:
       - name: Create plugin directory
         run: |
           mkdir -p plugin/${{ env.PLUGIN_NAME }}
-          cp -r Jellyfin.Plugin.Consistart/bin/Release/net9.0/* plugin/${{ env.PLUGIN_NAME }}/
+          cp Jellyfin.Plugin.Consistart/bin/Release/net9.0/*.dll plugin/${{ env.PLUGIN_NAME }}/
 
       - name: Create zip archive
         run: |
