@@ -47,8 +47,8 @@ jobs:
 
       - name: Create zip archive
         run: |
-          cd plugin
-          zip -r ${{ env.PLUGIN_NAME }}.zip ${{ env.PLUGIN_NAME }}
+          cd plugin/${{ env.PLUGIN_NAME }}
+          zip -r ../${{ env.PLUGIN_NAME }}.zip *.dll
 
       - name: Get version from release
         id: version
