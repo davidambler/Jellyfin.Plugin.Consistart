@@ -12,8 +12,10 @@ public class EpisodeThumbnailRendererTests
 {
     private static IFontProvider CreateFontProvider()
     {
+        var baseProvider = new FontProvider();
+        var fontFamily = baseProvider.GetFont("ColusRegular");
+
         var fontProvider = Substitute.For<IFontProvider>();
-        var fontFamily = SystemFonts.Families.First();
         fontProvider.GetFont(Arg.Any<string>()).Returns(fontFamily);
         return fontProvider;
     }
