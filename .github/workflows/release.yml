@@ -74,13 +74,18 @@ jobs:
         run: |
           if [ -f meta.json ]; then
             # Append new version to existing meta.json
-            jq '.[] |= (.versions += [{
-              "version": "'"'"'${{ steps.plugin_info.outputs.version }}'"'"'",
-              "changelog": "'"'"'${{ github.event.release.body }}'"'"'",
-              "targetAbi": "10.11.0.0",
-              "sourceUrl": "'"'"'${{ github.server_url }}/${{ github.repository }}/releases/download/${{ github.event.release.tag_name }}/Consistart.zip'"'"'",
-              "checksum": "'"'"'${{ steps.checksum.outputs.value }}'"'"'"
-            }])' meta.json > meta.json.tmp
+            jq \
+              --arg version "${{ steps.plugin_info.outputs.version }}" \
+              --arg changelog "${{ github.event.release.body }}" \
+              --arg sourceUrl "${{ github.server_url }}/${{ github.repository }}/releases/download/${{ github.event.release.tag_name }}/Consistart.zip" \
+              --arg checksum "${{ steps.checksum.outputs.value }}" \
+              '.[] |= (.versions += [{
+                version: $version,
+                changelog: $changelog,
+                targetAbi: "10.11.0.0",
+                sourceUrl: $sourceUrl,
+                checksum: $checksum
+              }])' meta.json > meta.json.tmp
             mv meta.json.tmp meta.json
           else
             # Create new meta.json with first version
