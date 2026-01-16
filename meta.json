@@ -1,0 +1,15 @@
+[
+  {
+    "guid": "44cec167-6151-4faa-ba99-73bfe4cce9b5",
+    "name": "Consistart",
+    "description": "Custom artwork rendering for Jellyfin with TMDb integration",
+    "owner": "consistart",
+    "overview": "Consistart provides custom artwork rendering capabilities including personalized posters, season posters, logos, and thumbnails with TMDb integration.",
+    "documentation": "https://github.com/consistart/Consistart/blob/main/README.md",
+    "category": "Metadata",
+    "author": "consistart",
+    "official": false,
+    "imageUrl": "https://raw.githubusercontent.com/consistart/Consistart/main/icon.png",
+    "versions": []
+  }
+]

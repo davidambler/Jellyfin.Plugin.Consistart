@@ -1,0 +1,126 @@
+name: Release
+
+on:
+  release:
+    types: [published]
+
+env:
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+  PLUGIN_NAME: Consistart
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "9.0.x"
+
+      - name: Restore dependencies
+        run: dotnet restore
+
+      - name: Build Release
+        run: dotnet build --no-restore --configuration Release
+
+      - name: Run tests
+        run: dotnet test --no-build --configuration Release
+
+      - name: Create plugin directory
+        run: |
+          mkdir -p plugin/${{ env.PLUGIN_NAME }}
+          cp -r Jellyfin.Plugin.Consistart/bin/Release/net9.0/* plugin/${{ env.PLUGIN_NAME }}/
+
+      - name: Create zip archive
+        run: |
+          cd plugin
+          zip -r ${{ env.PLUGIN_NAME }}.zip ${{ env.PLUGIN_NAME }}
+
+      - name: Get version from release
+        id: version
+        run: |
+          VERSION=${{ github.event.release.tag_name }}
+          VERSION=${VERSION#v}
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+      - name: Extract version info
+        id: plugin_info
+        run: |
+          GUID="44cec167-6151-4faa-ba99-73bfe4cce9b5"
+          NAME="Consistart"
+          VERSION=${{ steps.version.outputs.version }}
+          echo "guid=$GUID" >> $GITHUB_OUTPUT
+          echo "name=$NAME" >> $GITHUB_OUTPUT
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+      - name: Calculate checksum
+        id: checksum
+        run: |
+          CHECKSUM=$(sha256sum plugin/Consistart.zip | cut -d' ' -f1)
+          echo "value=$CHECKSUM" >> $GITHUB_OUTPUT
+
+      - name: Update meta.json
+        run: |
+          if [ -f meta.json ]; then
+            # Append new version to existing meta.json
+            jq ".[] |= .versions += [{
+              \"version\": \"${{ steps.plugin_info.outputs.version }}\",
+              \"changelog\": \"${{ github.event.release.body }}\",
+              \"targetAbi\": \"10.11.0.0\",
+              \"sourceUrl\": \"${{ github.server_url }}/${{ github.repository }}/releases/download/${{ github.event.release.tag_name }}/Consistart.zip\",
+              \"checksum\": \"${{ steps.checksum.outputs.value }}\"
+            }]" meta.json > meta.json.tmp
+            mv meta.json.tmp meta.json
+          else
+            # Create new meta.json with first version
+            jq -n "[{
+              \"guid\": \"${{ steps.plugin_info.outputs.guid }}\",
+              \"name\": \"${{ steps.plugin_info.outputs.name }}\",
+              \"description\": \"Custom artwork rendering for Jellyfin with TMDb integration\",
+              \"owner\": \"${{ github.repository_owner }}\",
+              \"overview\": \"Consistart provides custom artwork rendering capabilities including personalized posters, season posters, logos, and thumbnails with TMDb integration.\",
+              \"documentation\": \"https://github.com/${{ github.repository }}/blob/main/README.md\",
+              \"category\": \"Metadata\",
+              \"author\": \"${{ github.repository_owner }}\",
+              \"official\": false,
+              \"versions\": [{
+                \"version\": \"${{ steps.plugin_info.outputs.version }}\",
+                \"changelog\": \"${{ github.event.release.body }}\",
+                \"targetAbi\": \"10.11.0.0\",
+                \"sourceUrl\": \"${{ github.server_url }}/${{ github.repository }}/releases/download/${{ github.event.release.tag_name }}/Consistart.zip\",
+                \"checksum\": \"${{ steps.checksum.outputs.value }}\"
+              }]
+            }]" > meta.json
+          fi
+
+      - name: Upload release assets
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ github.event.release.upload_url }}
+          asset_path: ./plugin/Consistart.zip
+          asset_name: Consistart.zip
+          asset_content_type: application/zip
+
+      - name: Upload meta.json
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ github.event.release.upload_url }}
+          asset_path: ./meta.json
+          asset_name: meta.json
+          asset_content_type: application/json
+
+      - name: Update repository metadata
+        if: github.event.release.prerelease == false
+        run: |
+          echo "Release ${{ steps.plugin_info.outputs.version }} published successfully!"
+          echo "Download URL: ${{ github.server_url }}/${{ github.repository }}/releases/download/${{ github.event.release.tag_name }}/Consistart.zip"

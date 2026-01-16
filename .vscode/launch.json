@@ -1,0 +1,19 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Launch Jellyfin",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build-and-copy",
+            "program": "${config:jellyfinExe}",
+            "args": [
+                "--datadir",
+                "${env:JELLYFIN_DATA}"
+            ],
+            "cwd": "${env:JELLYFIN_HOME}",
+            "stopAtEntry": false,
+            "console": "internalConsole",
+        }
+    ]
+}

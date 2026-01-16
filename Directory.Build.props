@@ -1,0 +1,7 @@
+<Project>
+    <!-- Import machine-local overrides if they exist -->
+    <Import
+        Project="Directory.Build.local.props"
+        Condition="Exists('Directory.Build.local.props')"
+    />
+</Project>
