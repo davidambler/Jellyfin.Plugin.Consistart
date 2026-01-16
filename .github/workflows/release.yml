@@ -9,6 +9,11 @@ env:
   DOTNET_CLI_TELEMETRY_OPTOUT: true
   PLUGIN_NAME: Consistart
 
+permissions:
+  contents: write
+  checks: write
+  pull-requests: write
+
 jobs:
   release:
     runs-on: ubuntu-latest

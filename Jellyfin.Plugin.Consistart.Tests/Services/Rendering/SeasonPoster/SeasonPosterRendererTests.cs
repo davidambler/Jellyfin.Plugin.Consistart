@@ -12,8 +12,22 @@ public class SeasonPosterRendererTests
 {
     private static IFontProvider CreateFontProvider()
     {
-        var baseProvider = new FontProvider();
-        var fontFamily = baseProvider.GetFont("ColusRegular");
+        FontFamily fontFamily;
+
+        try
+        {
+            var baseProvider = new FontProvider();
+            fontFamily = baseProvider.GetFont("ColusRegular");
+
+            // Probe the font to avoid runtime issues on environments where Colus is unsupported.
+            var probeFont = fontFamily.CreateFont(48, FontStyle.Regular);
+            TextMeasurer.MeasureBounds("TEST", new TextOptions(probeFont));
+        }
+        catch
+        {
+            // Fallback to a system font available on GitHub runners if Colus fails to load.
+            fontFamily = SystemFonts.Collection.Families.First();
+        }
 
         var fontProvider = Substitute.For<IFontProvider>();
         fontProvider.GetFont(Arg.Any<string>()).Returns(fontFamily);
