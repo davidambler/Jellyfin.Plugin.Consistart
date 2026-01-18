@@ -9,7 +9,7 @@
         "category": "Metadata",
         "author": "davidambler",
         "official": false,
-        "imageUrl": "https://raw.githubusercontent.com/davidambler/Jellyfin.Plugin.Consistart/refs/heads/main/logo.png",
+        "imageUrl": "https://raw.githubusercontent.com/davidambler/Jellyfin.Plugin.Consistart/refs/heads/main/consistart.png",
         "versions": [
             {
                 "version": "1.0.5",
