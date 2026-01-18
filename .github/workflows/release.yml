@@ -70,28 +70,28 @@ jobs:
       - name: Calculate checksum
         id: checksum
         run: |
-          CHECKSUM=$(sha256sum plugin/Consistart.zip | cut -d' ' -f1)
+          CHECKSUM=$(md5sum plugin/Consistart.zip | cut -d' ' -f1)
           echo "value=$CHECKSUM" >> $GITHUB_OUTPUT
 
-      - name: Update meta.json
+      - name: Update manifest.json
         run: |
-          if [ -f meta.json ]; then
-            # Append new version to existing meta.json
+          if [ -f manifest.json ]; then
+            # Prepend new version to existing manifest.json
             jq \
               --arg version "${{ steps.plugin_info.outputs.version }}" \
               --arg changelog "${{ github.event.release.body }}" \
               --arg sourceUrl "${{ github.server_url }}/${{ github.repository }}/releases/download/${{ github.event.release.tag_name }}/Consistart.zip" \
               --arg checksum "${{ steps.checksum.outputs.value }}" \
-              '.[] |= (.versions += [{
+              '.[] |= ([{
                 version: $version,
                 changelog: $changelog,
                 targetAbi: "10.11.0.0",
                 sourceUrl: $sourceUrl,
                 checksum: $checksum
-              }])' meta.json > meta.json.tmp
-            mv meta.json.tmp meta.json
+              }] + .versions)' manifest.json > manifest.json.tmp
+            mv manifest.json.tmp manifest.json
           else
-            # Create new meta.json with first version
+            # Create new manifest.json with first version
             jq -n "[{
               \"guid\": \"${{ steps.plugin_info.outputs.guid }}\",
               \"name\": \"${{ steps.plugin_info.outputs.name }}\",
@@ -109,22 +109,22 @@ jobs:
                 \"sourceUrl\": \"${{ github.server_url }}/${{ github.repository }}/releases/download/${{ github.event.release.tag_name }}/Consistart.zip\",
                 \"checksum\": \"${{ steps.checksum.outputs.value }}\"
               }]
-            }]" > meta.json
+            }]" > manifest.json
           fi
 
-      - name: Commit and push meta.json update
+      - name: Commit and push manifest.json update
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          if git diff --quiet -- meta.json; then
-            echo "meta.json unchanged; skipping commit."
+          if git diff --quiet -- manifest.json; then
+            echo "manifest.json unchanged; skipping commit."
             exit 0
           fi
 
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add meta.json
-          git commit -m "chore: update meta.json for ${{ steps.plugin_info.outputs.version }}"
+          git add manifest.json
+          git commit -m "chore: update manifest.json for ${{ steps.plugin_info.outputs.version }}"
           git push origin HEAD:${{ github.event.release.target_commitish }}
 
       - name: Upload release assets
@@ -137,14 +137,14 @@ jobs:
           asset_name: Consistart.zip
           asset_content_type: application/zip
 
-      - name: Upload meta.json
+      - name: Upload manifest.json
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ github.event.release.upload_url }}
-          asset_path: ./meta.json
-          asset_name: meta.json
+          asset_path: ./manifest.json
+          asset_name: manifest.json
           asset_content_type: application/json
 
       - name: Update repository metadata
