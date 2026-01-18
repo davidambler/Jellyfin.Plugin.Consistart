@@ -10,7 +10,7 @@
             "label": "build",
             "command": "dotnet",
             "type": "shell",
-            "args": ["build", "${workspaceFolder}/${config:pluginName}.sln", "/property:GenerateFullPaths=true", "/consoleloggerparameters:NoSummary"],
+            "args": ["build", "${workspaceFolder}/Jellyfin.Plugin.Consistart.sln", "/property:GenerateFullPaths=true", "/consoleloggerparameters:NoSummary"],
             "group": "build",
             "presentation": {
                 "reveal": "silent"

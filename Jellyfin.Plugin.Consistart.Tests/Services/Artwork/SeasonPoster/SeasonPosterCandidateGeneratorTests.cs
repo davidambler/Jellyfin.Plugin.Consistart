@@ -1,4 +1,5 @@
 using Jellyfin.Plugin.Consistart.Services.Artwork;
+using Jellyfin.Plugin.Consistart.Services.Artwork.Poster;
 using Jellyfin.Plugin.Consistart.Services.Artwork.SeasonPoster;
 using Jellyfin.Plugin.Consistart.Services.Rendering;
 using Jellyfin.Plugin.Consistart.Services.Rendering.SeasonPoster;
@@ -23,10 +24,14 @@ public class SeasonPosterCandidateGeneratorTests
         var provider = Substitute.For<IArtworkImageProvider<SeasonPosterSource>>();
         var selector = Substitute.For<IArtworkImageSelector<SeasonPosterSource>>();
         var renderRequest = Substitute.For<IRenderRequestBuilder<SeasonPosterRenderRequest>>();
+        var parentPosterImageProvider = Substitute.For<IArtworkImageProvider<PosterSource>>();
+        var parentSelector = Substitute.For<IArtworkImageSelector<PosterSource>>();
         var generator = new SeasonPosterCandidateGenerator(
             library,
             provider,
+            parentPosterImageProvider,
             selector,
+            parentSelector,
             renderRequest
         );
 
@@ -43,10 +48,14 @@ public class SeasonPosterCandidateGeneratorTests
         var provider = Substitute.For<IArtworkImageProvider<SeasonPosterSource>>();
         var selector = Substitute.For<IArtworkImageSelector<SeasonPosterSource>>();
         var renderRequest = Substitute.For<IRenderRequestBuilder<SeasonPosterRenderRequest>>();
+        var parentPosterImageProvider = Substitute.For<IArtworkImageProvider<PosterSource>>();
+        var parentSelector = Substitute.For<IArtworkImageSelector<PosterSource>>();
         var generator = new SeasonPosterCandidateGenerator(
             library,
             provider,
+            parentPosterImageProvider,
             selector,
+            parentSelector,
             renderRequest
         );
 
@@ -63,10 +72,14 @@ public class SeasonPosterCandidateGeneratorTests
         var provider = Substitute.For<IArtworkImageProvider<SeasonPosterSource>>();
         var selector = Substitute.For<IArtworkImageSelector<SeasonPosterSource>>();
         var renderRequest = Substitute.For<IRenderRequestBuilder<SeasonPosterRenderRequest>>();
+        var parentPosterImageProvider = Substitute.For<IArtworkImageProvider<PosterSource>>();
+        var parentSelector = Substitute.For<IArtworkImageSelector<PosterSource>>();
         var generator = new SeasonPosterCandidateGenerator(
             library,
             provider,
+            parentPosterImageProvider,
             selector,
+            parentSelector,
             renderRequest
         );
 
@@ -83,10 +96,14 @@ public class SeasonPosterCandidateGeneratorTests
         var provider = Substitute.For<IArtworkImageProvider<SeasonPosterSource>>();
         var selector = Substitute.For<IArtworkImageSelector<SeasonPosterSource>>();
         var renderRequest = Substitute.For<IRenderRequestBuilder<SeasonPosterRenderRequest>>();
+        var parentPosterImageProvider = Substitute.For<IArtworkImageProvider<PosterSource>>();
+        var parentSelector = Substitute.For<IArtworkImageSelector<PosterSource>>();
         var generator = new SeasonPosterCandidateGenerator(
             library,
             provider,
+            parentPosterImageProvider,
             selector,
+            parentSelector,
             renderRequest
         );
 
@@ -107,10 +124,14 @@ public class SeasonPosterCandidateGeneratorTests
         var provider = Substitute.For<IArtworkImageProvider<SeasonPosterSource>>();
         var selector = Substitute.For<IArtworkImageSelector<SeasonPosterSource>>();
         var renderRequest = Substitute.For<IRenderRequestBuilder<SeasonPosterRenderRequest>>();
+        var parentPosterImageProvider = Substitute.For<IArtworkImageProvider<PosterSource>>();
+        var parentSelector = Substitute.For<IArtworkImageSelector<PosterSource>>();
         var generator = new SeasonPosterCandidateGenerator(
             library,
             provider,
+            parentPosterImageProvider,
             selector,
+            parentSelector,
             renderRequest
         );
 
@@ -133,10 +154,14 @@ public class SeasonPosterCandidateGeneratorTests
         var provider = Substitute.For<IArtworkImageProvider<SeasonPosterSource>>();
         var selector = Substitute.For<IArtworkImageSelector<SeasonPosterSource>>();
         var renderRequest = Substitute.For<IRenderRequestBuilder<SeasonPosterRenderRequest>>();
+        var parentPosterImageProvider = Substitute.For<IArtworkImageProvider<PosterSource>>();
+        var parentSelector = Substitute.For<IArtworkImageSelector<PosterSource>>();
         var generator = new SeasonPosterCandidateGenerator(
             library,
             provider,
+            parentPosterImageProvider,
             selector,
+            parentSelector,
             renderRequest
         );
 
@@ -156,10 +181,14 @@ public class SeasonPosterCandidateGeneratorTests
         var provider = Substitute.For<IArtworkImageProvider<SeasonPosterSource>>();
         var selector = Substitute.For<IArtworkImageSelector<SeasonPosterSource>>();
         var renderRequest = Substitute.For<IRenderRequestBuilder<SeasonPosterRenderRequest>>();
+        var parentPosterImageProvider = Substitute.For<IArtworkImageProvider<PosterSource>>();
+        var parentSelector = Substitute.For<IArtworkImageSelector<PosterSource>>();
         var generator = new SeasonPosterCandidateGenerator(
             library,
             provider,
+            parentPosterImageProvider,
             selector,
+            parentSelector,
             renderRequest
         );
 
@@ -181,10 +210,14 @@ public class SeasonPosterCandidateGeneratorTests
         var provider = Substitute.For<IArtworkImageProvider<SeasonPosterSource>>();
         var selector = Substitute.For<IArtworkImageSelector<SeasonPosterSource>>();
         var renderRequest = Substitute.For<IRenderRequestBuilder<SeasonPosterRenderRequest>>();
+        var parentPosterImageProvider = Substitute.For<IArtworkImageProvider<PosterSource>>();
+        var parentSelector = Substitute.For<IArtworkImageSelector<PosterSource>>();
         var generator = new SeasonPosterCandidateGenerator(
             library,
             provider,
+            parentPosterImageProvider,
             selector,
+            parentSelector,
             renderRequest
         );
 
@@ -204,18 +237,18 @@ public class SeasonPosterCandidateGeneratorTests
         parent.SetProviderId(MetadataProvider.Tmdb, "12345");
         library.GetItemById(parentId).Returns(parent);
         var provider = Substitute.For<IArtworkImageProvider<SeasonPosterSource>>();
-        provider
-            .GetImagesAsync(Arg.Any<BaseItem>(), Arg.Any<CancellationToken>())
-            .Returns(new List<SeasonPosterSource>());
+        provider.GetImagesAsync(Arg.Any<BaseItem>(), Arg.Any<CancellationToken>()).Returns([]);
         var selector = Substitute.For<IArtworkImageSelector<SeasonPosterSource>>();
-        selector
-            .SelectImages(Arg.Any<IReadOnlyList<SeasonPosterSource>>())
-            .Returns(new List<SeasonPosterSource>());
+        selector.SelectImages(Arg.Any<IReadOnlyList<SeasonPosterSource>>()).Returns([]);
+        var parentPosterImageProvider = Substitute.For<IArtworkImageProvider<PosterSource>>();
+        var parentSelector = Substitute.For<IArtworkImageSelector<PosterSource>>();
         var renderRequest = Substitute.For<IRenderRequestBuilder<SeasonPosterRenderRequest>>();
         var generator = new SeasonPosterCandidateGenerator(
             library,
             provider,
+            parentPosterImageProvider,
             selector,
+            parentSelector,
             renderRequest
         );
 
@@ -245,6 +278,8 @@ public class SeasonPosterCandidateGeneratorTests
 
         var selector = Substitute.For<IArtworkImageSelector<SeasonPosterSource>>();
         selector.SelectImages(Arg.Any<IReadOnlyList<SeasonPosterSource>>()).Returns(posters);
+        var parentPosterImageProvider = Substitute.For<IArtworkImageProvider<PosterSource>>();
+        var parentSelector = Substitute.For<IArtworkImageSelector<PosterSource>>();
 
         var renderRequest = Substitute.For<IRenderRequestBuilder<SeasonPosterRenderRequest>>();
         renderRequest
@@ -254,7 +289,9 @@ public class SeasonPosterCandidateGeneratorTests
         var generator = new SeasonPosterCandidateGenerator(
             library,
             provider,
+            parentPosterImageProvider,
             selector,
+            parentSelector,
             renderRequest
         );
 
@@ -293,6 +330,9 @@ public class SeasonPosterCandidateGeneratorTests
         var selector = Substitute.For<IArtworkImageSelector<SeasonPosterSource>>();
         selector.SelectImages(Arg.Any<IReadOnlyList<SeasonPosterSource>>()).Returns(posters);
 
+        var parentPosterImageProvider = Substitute.For<IArtworkImageProvider<PosterSource>>();
+        var parentSelector = Substitute.For<IArtworkImageSelector<PosterSource>>();
+
         var renderRequest = Substitute.For<IRenderRequestBuilder<SeasonPosterRenderRequest>>();
         renderRequest
             .BuildUrl(Arg.Any<SeasonPosterRenderRequest>())
@@ -305,7 +345,9 @@ public class SeasonPosterCandidateGeneratorTests
         var generator = new SeasonPosterCandidateGenerator(
             library,
             provider,
+            parentPosterImageProvider,
             selector,
+            parentSelector,
             renderRequest
         );
 
@@ -339,6 +381,9 @@ public class SeasonPosterCandidateGeneratorTests
         var selector = Substitute.For<IArtworkImageSelector<SeasonPosterSource>>();
         selector.SelectImages(Arg.Any<IReadOnlyList<SeasonPosterSource>>()).Returns(posters);
 
+        var parentPosterImageProvider = Substitute.For<IArtworkImageProvider<PosterSource>>();
+        var parentSelector = Substitute.For<IArtworkImageSelector<PosterSource>>();
+
         var renderRequest = Substitute.For<IRenderRequestBuilder<SeasonPosterRenderRequest>>();
         renderRequest
             .BuildUrl(Arg.Any<SeasonPosterRenderRequest>())
@@ -347,7 +392,9 @@ public class SeasonPosterCandidateGeneratorTests
         var generator = new SeasonPosterCandidateGenerator(
             library,
             provider,
+            parentPosterImageProvider,
             selector,
+            parentSelector,
             renderRequest
         );
 
@@ -377,16 +424,19 @@ public class SeasonPosterCandidateGeneratorTests
         provider.GetImagesAsync(Arg.Any<BaseItem>(), Arg.Any<CancellationToken>()).Returns(posters);
 
         var selector = Substitute.For<IArtworkImageSelector<SeasonPosterSource>>();
-        selector
-            .SelectImages(Arg.Any<IReadOnlyList<SeasonPosterSource>>())
-            .Returns(new List<SeasonPosterSource>());
+        selector.SelectImages(Arg.Any<IReadOnlyList<SeasonPosterSource>>()).Returns([]);
+
+        var parentPosterImageProvider = Substitute.For<IArtworkImageProvider<PosterSource>>();
+        var parentSelector = Substitute.For<IArtworkImageSelector<PosterSource>>();
 
         var renderRequest = Substitute.For<IRenderRequestBuilder<SeasonPosterRenderRequest>>();
 
         var generator = new SeasonPosterCandidateGenerator(
             library,
             provider,
+            parentPosterImageProvider,
             selector,
+            parentSelector,
             renderRequest
         );
 
@@ -421,6 +471,9 @@ public class SeasonPosterCandidateGeneratorTests
         var selector = Substitute.For<IArtworkImageSelector<SeasonPosterSource>>();
         selector.SelectImages(Arg.Any<IReadOnlyList<SeasonPosterSource>>()).Returns(posters);
 
+        var parentPosterImageProvider = Substitute.For<IArtworkImageProvider<PosterSource>>();
+        var parentSelector = Substitute.For<IArtworkImageSelector<PosterSource>>();
+
         var renderRequest = Substitute.For<IRenderRequestBuilder<SeasonPosterRenderRequest>>();
         renderRequest
             .BuildUrl(Arg.Any<SeasonPosterRenderRequest>())
@@ -429,7 +482,9 @@ public class SeasonPosterCandidateGeneratorTests
         var generator = new SeasonPosterCandidateGenerator(
             library,
             provider,
+            parentPosterImageProvider,
             selector,
+            parentSelector,
             renderRequest
         );
 
@@ -479,6 +534,9 @@ public class SeasonPosterCandidateGeneratorTests
             .SelectImages(Arg.Any<IReadOnlyList<SeasonPosterSource>>())
             .Returns(selectedPosters);
 
+        var parentPosterImageProvider = Substitute.For<IArtworkImageProvider<PosterSource>>();
+        var parentSelector = Substitute.For<IArtworkImageSelector<PosterSource>>();
+
         var renderRequest = Substitute.For<IRenderRequestBuilder<SeasonPosterRenderRequest>>();
         renderRequest
             .BuildUrl(Arg.Any<SeasonPosterRenderRequest>())
@@ -487,7 +545,9 @@ public class SeasonPosterCandidateGeneratorTests
         var generator = new SeasonPosterCandidateGenerator(
             library,
             provider,
+            parentPosterImageProvider,
             selector,
+            parentSelector,
             renderRequest
         );
 
@@ -497,6 +557,105 @@ public class SeasonPosterCandidateGeneratorTests
 
         Assert.Single(result);
         Assert.Equal("12345:season:poster:1:/path/to/poster1.jpg:season.default", result[0].Id);
+    }
+
+    [Fact]
+    public async Task GetCandidatesAsync_falls_back_to_parent_posters_when_no_season_posters()
+    {
+        var library = Substitute.For<ILibraryManager>();
+        var parentId = Guid.NewGuid();
+        var tmdbId = 12345;
+        var parent = new Series();
+        parent.SetProviderId(MetadataProvider.Tmdb, tmdbId.ToString());
+        library.GetItemById(parentId).Returns(parent);
+
+        // Season posters provider returns empty
+        var provider = Substitute.For<IArtworkImageProvider<SeasonPosterSource>>();
+        provider.GetImagesAsync(Arg.Any<BaseItem>(), Arg.Any<CancellationToken>()).Returns([]);
+
+        var selector = Substitute.For<IArtworkImageSelector<SeasonPosterSource>>();
+        selector.SelectImages(Arg.Any<IReadOnlyList<SeasonPosterSource>>()).Returns([]);
+
+        // Parent posters provider returns posters
+        var parentPosterImageProvider = Substitute.For<IArtworkImageProvider<PosterSource>>();
+        var parentPosters = new List<PosterSource>
+        {
+            new(FilePath: "/path/to/parent_poster.jpg", Language: null, Width: 500, Height: 750),
+        };
+        parentPosterImageProvider
+            .GetImagesAsync(Arg.Any<BaseItem>(), Arg.Any<CancellationToken>())
+            .Returns(parentPosters);
+
+        var parentSelector = Substitute.For<IArtworkImageSelector<PosterSource>>();
+        parentSelector.SelectImages(Arg.Any<IReadOnlyList<PosterSource>>()).Returns(parentPosters);
+
+        var renderRequest = Substitute.For<IRenderRequestBuilder<SeasonPosterRenderRequest>>();
+        renderRequest
+            .BuildUrl(Arg.Any<SeasonPosterRenderRequest>())
+            .Returns("http://localhost:8096/consistart/render?token=abc123");
+
+        var generator = new SeasonPosterCandidateGenerator(
+            library,
+            provider,
+            parentPosterImageProvider,
+            selector,
+            parentSelector,
+            renderRequest
+        );
+
+        var season = new Season { ParentId = parentId, IndexNumber = 1 };
+
+        var result = await generator.GetCandidatesAsync(season, ImageType.Primary);
+
+        Assert.Single(result);
+        Assert.Equal(
+            "12345:season:poster:1:/path/to/parent_poster.jpg:season.default:parent",
+            result[0].Id
+        );
+    }
+
+    [Fact]
+    public async Task GetCandidatesAsync_returns_empty_when_both_season_and_parent_posters_empty()
+    {
+        var library = Substitute.For<ILibraryManager>();
+        var parentId = Guid.NewGuid();
+        var tmdbId = 12345;
+        var parent = new Series();
+        parent.SetProviderId(MetadataProvider.Tmdb, tmdbId.ToString());
+        library.GetItemById(parentId).Returns(parent);
+
+        // Season posters provider returns empty
+        var provider = Substitute.For<IArtworkImageProvider<SeasonPosterSource>>();
+        provider.GetImagesAsync(Arg.Any<BaseItem>(), Arg.Any<CancellationToken>()).Returns([]);
+
+        var selector = Substitute.For<IArtworkImageSelector<SeasonPosterSource>>();
+        selector.SelectImages(Arg.Any<IReadOnlyList<SeasonPosterSource>>()).Returns([]);
+
+        // Parent posters provider also returns empty
+        var parentPosterImageProvider = Substitute.For<IArtworkImageProvider<PosterSource>>();
+        parentPosterImageProvider
+            .GetImagesAsync(Arg.Any<BaseItem>(), Arg.Any<CancellationToken>())
+            .Returns([]);
+
+        var parentSelector = Substitute.For<IArtworkImageSelector<PosterSource>>();
+        parentSelector.SelectImages(Arg.Any<IReadOnlyList<PosterSource>>()).Returns([]);
+
+        var renderRequest = Substitute.For<IRenderRequestBuilder<SeasonPosterRenderRequest>>();
+
+        var generator = new SeasonPosterCandidateGenerator(
+            library,
+            provider,
+            parentPosterImageProvider,
+            selector,
+            parentSelector,
+            renderRequest
+        );
+
+        var season = new Season { ParentId = parentId, IndexNumber = 1 };
+
+        var result = await generator.GetCandidatesAsync(season, ImageType.Primary);
+
+        Assert.Empty(result);
     }
 
     [Fact]
@@ -519,12 +678,17 @@ public class SeasonPosterCandidateGeneratorTests
             );
 
         var selector = Substitute.For<IArtworkImageSelector<SeasonPosterSource>>();
+        var parentPosterImageProvider = Substitute.For<IArtworkImageProvider<PosterSource>>();
+        var parentSelector = Substitute.For<IArtworkImageSelector<PosterSource>>();
+
         var renderRequest = Substitute.For<IRenderRequestBuilder<SeasonPosterRenderRequest>>();
 
         var generator = new SeasonPosterCandidateGenerator(
             library,
             provider,
+            parentPosterImageProvider,
             selector,
+            parentSelector,
             renderRequest
         );
 

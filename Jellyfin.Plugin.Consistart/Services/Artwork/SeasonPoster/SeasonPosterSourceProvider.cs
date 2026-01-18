@@ -5,7 +5,6 @@ using MediaBrowser.Controller.Entities;
 using MediaBrowser.Controller.Entities.TV;
 using MediaBrowser.Controller.Library;
 using MediaBrowser.Model.Entities;
-using TMDbLib.Objects.General;
 
 namespace Jellyfin.Plugin.Consistart.Services.Artwork.SeasonPoster;
 
@@ -34,8 +33,7 @@ internal sealed class SeasonPosterSourceProvider(
         if (item.IndexNumber == null)
             return [];
 
-        ImagesWithId images;
-        images = await tmdbImagesClient
+        var images = await tmdbImagesClient
             .GetImagesAsync(
                 tmdbId,
                 MediaKind.TvSeason,
@@ -45,15 +43,7 @@ internal sealed class SeasonPosterSourceProvider(
             .ConfigureAwait(false);
 
         if (images is null || images.Posters.Count == 0)
-        {
-            // Fallback to series posters
-            images = await tmdbImagesClient
-                .GetImagesAsync(tmdbId, MediaKind.TvShow, cancellationToken: cancellationToken)
-                .ConfigureAwait(false);
-
-            if (images is null || images.Posters.Count == 0)
-                return [];
-        }
+            return [];
 
         return
         [

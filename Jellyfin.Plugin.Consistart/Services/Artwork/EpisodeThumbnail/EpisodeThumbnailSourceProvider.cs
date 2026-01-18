@@ -21,8 +21,10 @@ internal sealed class EpisodeThumbnailSourceProvider(
         if (item is not Episode episode)
             return [];
 
-        var series = libraryManager.GetItemById(episode.SeriesId) as Series;
-        if (series is null || !series.TryGetProviderIdAsInt(MetadataProvider.Tmdb, out var tmdbId))
+        if (
+            libraryManager.GetItemById(episode.SeriesId) is not Series series
+            || !series.TryGetProviderIdAsInt(MetadataProvider.Tmdb, out var tmdbId)
+        )
             return [];
 
         if (!episode.ParentIndexNumber.HasValue || !episode.IndexNumber.HasValue)

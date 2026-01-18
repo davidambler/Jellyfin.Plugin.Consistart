@@ -1,4 +1,5 @@
 using Jellyfin.Plugin.Consistart.Extensions;
+using Jellyfin.Plugin.Consistart.Services.Artwork.Poster;
 using Jellyfin.Plugin.Consistart.Services.Rendering;
 using Jellyfin.Plugin.Consistart.Services.Rendering.SeasonPoster;
 using MediaBrowser.Controller.Entities;
@@ -10,8 +11,10 @@ namespace Jellyfin.Plugin.Consistart.Services.Artwork.SeasonPoster;
 
 internal sealed class SeasonPosterCandidateGenerator(
     ILibraryManager library,
-    IArtworkImageProvider<SeasonPosterSource> provider,
+    IArtworkImageProvider<SeasonPosterSource> seasonPosterProvider,
+    IArtworkImageProvider<PosterSource> parentPosterImageProvider,
     IArtworkImageSelector<SeasonPosterSource> selector,
+    IArtworkImageSelector<PosterSource> parentSelector,
     IRenderRequestBuilder<SeasonPosterRenderRequest> renderRequest
 ) : IArtworkCandidateGenerator
 {
@@ -41,33 +44,75 @@ internal sealed class SeasonPosterCandidateGenerator(
         if (item.IndexNumber is null)
             return [];
 
-        var posters = await provider.GetImagesAsync(item, cancellationToken).ConfigureAwait(false);
+        var posters = await seasonPosterProvider
+            .GetImagesAsync(item, cancellationToken)
+            .ConfigureAwait(false);
         var selected = selector.SelectImages(posters);
 
-        var results = new List<ArtworkCandidateDto>(selected.Count);
-        foreach (var poster in selected)
+        var results = new List<ArtworkCandidateDto>();
+        AddResults(results, selected, tmdbId, item.IndexNumber.Value, fallback: false);
+
+        if (results.Count == 0) // Fallback to parent posters if no season posters found
         {
+            var parentPosters = await parentPosterImageProvider
+                .GetImagesAsync(parent, cancellationToken)
+                .ConfigureAwait(false);
+            var parentSelected = parentSelector.SelectImages(parentPosters);
+            if (parentSelected.Count == 0)
+                return [];
+
+            AddResults(results, parentSelected, tmdbId, item.IndexNumber.Value, fallback: true);
+        }
+
+        return results;
+    }
+
+    /// <summary>
+    /// Adds artwork candidates to the results list.
+    /// </summary>
+    /// <typeparam name="T">The type of artwork image source.</typeparam>
+    /// <param name="results">The list to add results to.</param>
+    /// <param name="posters">The list of posters to process.</param>
+    /// <param name="tmdbId">The TMDb ID of the parent show.</param>
+    /// <param name="seasonNumber">The season number.</param>
+    /// <param name="fallback">Indicates if this is a fallback from parent posters.</param>
+    private void AddResults<T>(
+        List<ArtworkCandidateDto> results,
+        IReadOnlyList<T> posters,
+        int tmdbId,
+        int seasonNumber,
+        bool fallback
+    )
+        where T : IArtworkImageSource
+    {
+        var suffix = fallback ? ":parent" : string.Empty;
+
+        foreach (var poster in posters)
+        {
+            var filePath = ((dynamic)poster).FilePath;
+            var width = ((dynamic)poster).Width;
+            var height = ((dynamic)poster).Height;
+            var language = ((dynamic)poster).Language;
+
             var request = new SeasonPosterRenderRequest(
                 TmdbId: tmdbId,
-                SeasonNumber: item.IndexNumber.Value,
-                SeasonPosterFilePath: poster.FilePath,
+                SeasonNumber: seasonNumber,
+                SeasonPosterFilePath: filePath,
                 Preset: DefaultPreset
             );
 
             var url = renderRequest.BuildUrl(request);
-            var id = $"{tmdbId}:season:poster:{item.IndexNumber}:{poster.FilePath}:{DefaultPreset}";
+            var id = $"{tmdbId}:season:poster:{seasonNumber}:{filePath}:{DefaultPreset}{suffix}";
 
             results.Add(
                 new ArtworkCandidateDto(
                     Id: id,
                     Url: url,
-                    Width: poster.Width,
-                    Height: poster.Height,
-                    Language: poster.Language
+                    Width: width,
+                    Height: height,
+                    Language: language
                 )
             );
         }
-
-        return results;
     }
 }

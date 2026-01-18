@@ -1,4 +1,5 @@
 {
+    "jellyfinExe": "${userHome}/scoop/apps/jellyfin/current/system/jellyfin.exe",
     "editor.formatOnSave": true,
     "editor.defaultFormatter": "csharpier.csharpier-vscode",
     "[csharp]": {
