@@ -82,13 +82,13 @@ jobs:
               --arg changelog "${{ github.event.release.body }}" \
               --arg sourceUrl "${{ github.server_url }}/${{ github.repository }}/releases/download/${{ github.event.release.tag_name }}/Consistart.zip" \
               --arg checksum "${{ steps.checksum.outputs.value }}" \
-              '.[] |= ([{
+              '.[] |= . + {versions: ([{
                 version: $version,
                 changelog: $changelog,
                 targetAbi: "10.11.0.0",
                 sourceUrl: $sourceUrl,
                 checksum: $checksum
-              }] + .versions)' manifest.json > manifest.json.tmp
+              }] + .versions)}' manifest.json > manifest.json.tmp
             mv manifest.json.tmp manifest.json
           else
             # Create new manifest.json with first version
